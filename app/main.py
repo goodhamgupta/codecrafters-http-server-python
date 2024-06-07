@@ -34,6 +34,9 @@ class View:
         content = args["url"].split("/")[2]
         content_encoding_header = ""
         if len(args["request_lines"]) > cls.ENCODING_IDX:
+            print("*********************")
+            print(args["request_lines"][cls.ENCODING_IDX])
+            print("*********************")
             encoding = args["request_lines"][cls.ENCODING_IDX].split(":")[1].strip()
             if encoding in cls.VALID_ENCODINGS:
                 content_encoding_header = f"Content-Encoding: {encoding}"
