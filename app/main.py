@@ -1,4 +1,5 @@
 import socket
+from pathlib import Path
 from threading import Thread
 
 
@@ -61,6 +62,26 @@ class View:
             "utf-8"
         )
 
+    @staticmethod
+    def files(**args) -> bytes:
+        """
+        Returns the HTTP response for the files URL.
+
+        Args:
+            url (str): The requested URL.
+
+        Returns:
+            bytes: The HTTP response in bytes.
+        """
+        fname = args["url"].split("/")[2]
+        path = Path(f"/tmp/{fname}")
+        if path.exists():
+            content = path.read_text()
+            content_len = len(content)
+            return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode("utf-8")
+        else:
+            return b"HTTP/1.1 404 Not Found\r\n\r\n"
+
 
 def router(request: str) -> bytes:
     """
@@ -82,7 +103,7 @@ def router(request: str) -> bytes:
     print(f"Requested URL: {url}")
     endpoint = "".join(url.split("/")[ENDPOINT_SLICE])
     print(f"Endpoint: {endpoint}")
-    mapping = {"": View.root, "echo": View.echo, "user-agent": View.user_agent}
+    mapping = {"": View.root, "echo": View.echo, "user-agent": View.user_agent, "files": View.files}
     return mapping.get(endpoint, View.not_found)(url=url, request_lines=request_lines)
 
 
