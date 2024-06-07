@@ -54,7 +54,7 @@ class View:
         content = content.encode("utf-8")
         if should_encode_content:
             tmp = gzip.compress(content)
-            content = tmp.hex().encode("utf-8")
+            content = tmp.hex()
             content_len = len(tmp)
         else:
             content_len = len(content)
@@ -62,7 +62,7 @@ class View:
         print("Content Length: ", content_len)
         print("Content Encoding Header: ", content_encoding_header)
         if len(content_encoding_header) > 0:
-            return f"HTTP/1.1 200 OK\r\n{content_encoding_header}\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n".encode("utf-8") + content
+            return f"HTTP/1.1 200 OK\r\n{content_encoding_header}\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode("utf-8")
         else:
             return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n".encode(
                 "utf-8"
