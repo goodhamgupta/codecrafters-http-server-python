@@ -30,7 +30,6 @@ class View:
             "utf-8"
         )
 
-
     @staticmethod
     def not_found(**args) -> bytes:
         """
@@ -76,6 +75,7 @@ def router(request: str) -> bytes:
     user_agent = request_lines[2].split()[1]
     print(f"Requested URL: {url}")
     endpoint = "".join(url.split("/")[ENDPOINT_SLICE])
+    print(f"Endpoint: {endpoint}")
     mapping = {"": View.root, "echo": View.echo, "user-agent": View.user_agent}
     return mapping.get(endpoint, View.not_found)(url=url, user_agent=user_agent)
 
