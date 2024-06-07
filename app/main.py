@@ -88,7 +88,7 @@ class View:
             else:
                 return b"HTTP/1.1 404 Not Found\r\n\r\n"
         elif method == "POST":
-            content_slice = slice(6, None)
+            content_slice = slice(4, None)
             content = "\n".join(args["request_lines"][content_slice])
             path.write_text(content)
             return b"HTTP/1.1 201 Created\r\n\r\n"
