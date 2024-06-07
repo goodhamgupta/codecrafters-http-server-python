@@ -82,7 +82,7 @@ class View:
         if path.exists():
             content = path.read_text()
             content_len = len(content.encode("utf-8"))
-            return f"HTTP/1.1 200 OK\r\nContent-Type: application:octet/stream\r\nContent-Length: {content_len}\r\n\r\n{content}".encode("utf-8")
+            return f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {content_len}\r\n\r\n{content}".encode("utf-8")
         else:
             return b"HTTP/1.1 404 Not Found\r\n\r\n"
 
