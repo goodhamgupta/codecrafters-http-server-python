@@ -1,43 +1,66 @@
 import socket
 
 
-ENDPOINT_SLICE = slice(0, 2)
+class View:
+    @staticmethod
+    def root(**args) -> bytes:
+        """
+        Returns the HTTP response for the root URL.
 
-def root(**args) -> bytes:
-    """
-    Returns the HTTP response for the root URL.
+        Returns:
+            bytes: The HTTP response in bytes.
+        """
+        return b"HTTP/1.1 200 OK\r\n\r\n"
 
-    Returns:
-        bytes: The HTTP response in bytes.
-    """
-    return b"HTTP/1.1 200 OK\r\n\r\n"
 
-def echo(**args) -> bytes:
-    """
-    Returns the HTTP response for the echo URL.
+    @staticmethod
+    def echo(**args) -> bytes:
+        """
+        Returns the HTTP response for the echo URL.
 
-    Args:
-        url (str): The requested URL.
+        Args:
+            url (str): The requested URL.
 
-    Returns:
-        bytes: The HTTP response in bytes.
-    """
-    content = args['url'].split("/")[2]
-    content_len = len(content)
-    return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode(
-        "utf-8"
-    )
+        Returns:
+            bytes: The HTTP response in bytes.
+        """
+        content = args["url"].split("/")[2]
+        content_len = len(content)
+        return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode(
+            "utf-8"
+        )
 
-def not_found(**args) -> bytes:
-    """
-    Returns the HTTP response for a 404 Not Found error.
 
-    Returns:
-        bytes: The HTTP response in bytes.
-    """
-    return b"HTTP/1.1 404 Not Found\r\n\r\n"
+    @staticmethod
+    def not_found(**args) -> bytes:
+        """
+        Returns the HTTP response for a 404 Not Found error.
 
-def router(url) -> bytes:
+        Returns:
+            bytes: The HTTP response in bytes.
+        """
+        return b"HTTP/1.1 404 Not Found\r\n\r\n"
+
+
+    @staticmethod
+    def user_agent(**args) -> bytes:
+        """
+        Returns the HTTP response containing the User-Agent header.
+
+        Args:
+            url (str): The requested URL.
+
+        Returns:
+            bytes: The HTTP response in bytes.
+        """
+        content = args["user_agent"]
+        content_len = len(content)
+        return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode(
+            "utf-8"
+        )
+
+
+def router(request: str) -> bytes:
     """
     Checks the requested URL and returns the appropriate HTTP response.
 
@@ -47,13 +70,14 @@ def router(url) -> bytes:
     Returns:
         bytes: The HTTP response in bytes.
     """
+    ENDPOINT_SLICE = slice(0, 2)
+    request_lines = request.splitlines()
+    url = request_lines[0].split()[1]
+    user_agent = request_lines[2].split()[1]
+    print(f"Requested URL: {url}")
     endpoint = "".join(url.split("/")[ENDPOINT_SLICE])
-    print("ENDPOINT: ", endpoint)
-    mapping = {
-        "": root,
-        "echo": echo,
-    }
-    return mapping.get(endpoint, not_found)(url=url)
+    mapping = {"": View.root, "echo": View.echo, "user-agent": View.user_agent}
+    return mapping.get(endpoint, View.not_found)(url=url, user_agent=user_agent)
 
 
 def main():
@@ -68,10 +92,7 @@ def main():
             # User-Agent: curl/8.4.0
             # Accept: */*
             print("Received request:", request)
-            request_line = request.splitlines()[0]
-            url = request_line.split()[1]
-            print(f"Requested URL: {url}")
-            response = router(url)
+            response = router(request)
             client_sock.sendall(response)
             client_sock.close()
 
