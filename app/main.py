@@ -7,7 +7,7 @@ from typing import Tuple
 
 
 class View:
-    ENCODING_IDX = 4
+    ENCODING_IDX = 2
     VALID_ENCODINGS = ["utf-8", "utf-16", "utf-32", "gzip"]
 
     @staticmethod
