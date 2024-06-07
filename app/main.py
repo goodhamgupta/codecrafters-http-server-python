@@ -11,7 +11,7 @@ def main():
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     while True:
         client_sock, client_addr = server_socket.accept() # wait for client
-        client_sock.sendall(b"HTTP/1.1 200 OK \r\n\r\n")
+        client_sock.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
         client_sock.close()
 
 
