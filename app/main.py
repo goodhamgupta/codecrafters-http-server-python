@@ -72,6 +72,7 @@ def router(request: str) -> bytes:
     ENDPOINT_SLICE = slice(0, 2)
     request_lines = request.splitlines()
     url = request_lines[0].split()[1]
+    print("Request LINES: ", request_lines)
     user_agent = request_lines[2].split()[1]
     print(f"Requested URL: {url}")
     endpoint = "".join(url.split("/")[ENDPOINT_SLICE])
