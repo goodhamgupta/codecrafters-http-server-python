@@ -36,3 +36,5 @@ Note: This section is for stages 2 and beyond.
    `app/main.py`.
 1. Commit your changes and run `git push origin master` to submit your solution
    to CodeCrafters. Test output will be streamed to your terminal.
+
+NOTE: Completed all stages, including GZIP compression extension! :party
