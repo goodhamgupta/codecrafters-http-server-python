@@ -79,12 +79,21 @@ class View:
         fname = args["url"].split("/")[2]
         root_dir = getattr(args["parser_args"], "directory")
         path = Path(f"{root_dir}/{fname}")
-        if path.exists():
-            content = path.read_text()
-            content_len = len(content.encode("utf-8"))
-            return f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {content_len}\r\n\r\n{content}".encode("utf-8")
+        method = args['request_lines'][0].split()[0].strip().upper()
+        if method == "GET":
+            if path.exists():
+                content = path.read_text()
+                content_len = len(content.encode("utf-8"))
+                return f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {content_len}\r\n\r\n{content}".encode("utf-8")
+            else:
+                return b"HTTP/1.1 404 Not Found\r\n\r\n"
+        elif method == "POST":
+            content_slice = slice(6, None)
+            content = "\n".join(args["request_lines"][content_slice])
+            path.write_text(content)
+            return b"HTTP/1.1 201 Created\r\n\r\n"
         else:
-            return b"HTTP/1.1 404 Not Found\r\n\r\n"
+            return b"HTTP/1.1 405 Method Not Allowed\r\n\r\n"
 
 
 def router(request: str, parser_args: Namespace) -> bytes:
