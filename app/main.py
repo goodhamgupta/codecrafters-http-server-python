@@ -56,6 +56,8 @@ class View:
         else:
             content = content.encode("utf-8")
         content_len = len(content)
+        print("Content: ", content)
+        print("Content Encoding Header: ", content_encoding_header)
         if len(content_encoding_header) > 0:
             return f"HTTP/1.1 200 OK\r\n{content_encoding_header}\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode(
                 "utf-8"
