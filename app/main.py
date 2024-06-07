@@ -36,9 +36,14 @@ class View:
         if len(args["request_lines"]) > cls.ENCODING_IDX:
             encoding_split = args["request_lines"][cls.ENCODING_IDX].split(":")
             if len(encoding_split) > 1:
-                encoding = encoding_split[1].strip()
-                if encoding in cls.VALID_ENCODINGS:
-                    content_encoding_header = f"Content-Encoding: {encoding}"
+                encoding_list = list(map(lambda x: x.strip().lower(), encoding_split[1].split(",")))
+                print("Encoding list: ", encoding_list)
+                valid_encodings = []
+                for candidate_encoding in encoding_list:
+                    if candidate_encoding in cls.VALID_ENCODINGS:
+                        valid_encodings.append(candidate_encoding)
+                if len(valid_encodings) > 0:
+                    content_encoding_header = f"Content-Encoding: {','.join(valid_encodings)}"
         content_len = len(content)
         if len(content_encoding_header) > 0:
             return f"HTTP/1.1 200 OK\r\n{content_encoding_header}\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode(
