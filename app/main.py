@@ -53,20 +53,27 @@ class View:
         content = args["url"].split("/")[2]
         content = content.encode("utf-8")
         if should_encode_content:
-            tmp = gzip.compress(content)
-            content = tmp.hex()
-            content_len = len(tmp)
+            content = gzip.compress(content)
+            content_len = len(content)
         else:
             content_len = len(content)
         print("Content: ", type(content))
         print("Content Length: ", content_len)
         print("Content Encoding Header: ", content_encoding_header)
         if len(content_encoding_header) > 0:
-            return f"HTTP/1.1 200 OK\r\n{content_encoding_header}\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode("utf-8")
+            return (
+                f"HTTP/1.1 200 OK\r\n{content_encoding_header}\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n".encode(
+                    "utf-8"
+                )
+                + content
+            )
         else:
-            return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n".encode(
-                "utf-8"
-            ) + content
+            return (
+                f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n".encode(
+                    "utf-8"
+                )
+                + content
+            )
 
     @staticmethod
     def not_found(**args) -> bytes:
