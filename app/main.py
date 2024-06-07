@@ -52,7 +52,7 @@ class View:
                     )
         content = args["url"].split("/")[2]
         if should_encode_content:
-            content = gzip.compress(content.encode("utf-8")).hex()
+            content = gzip.compress(content.encode("utf-8"))
         else:
             content = content.encode("utf-8")
         content_len = len(content)
