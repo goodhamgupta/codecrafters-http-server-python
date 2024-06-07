@@ -1,6 +1,42 @@
 import socket
 
 
+ENDPOINT_SLICE = slice(0, 2)
+
+def root(**args) -> bytes:
+    """
+    Returns the HTTP response for the root URL.
+
+    Returns:
+        bytes: The HTTP response in bytes.
+    """
+    return b"HTTP/1.1 200 OK\r\n\r\n"
+
+def echo(**args) -> bytes:
+    """
+    Returns the HTTP response for the echo URL.
+
+    Args:
+        url (str): The requested URL.
+
+    Returns:
+        bytes: The HTTP response in bytes.
+    """
+    content = args['url'].split("/")[2]
+    content_len = len(content)
+    return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode(
+        "utf-8"
+    )
+
+def not_found(**args) -> bytes:
+    """
+    Returns the HTTP response for a 404 Not Found error.
+
+    Returns:
+        bytes: The HTTP response in bytes.
+    """
+    return b"HTTP/1.1 404 Not Found\r\n\r\n"
+
 def router(url) -> bytes:
     """
     Checks the requested URL and returns the appropriate HTTP response.
@@ -11,16 +47,13 @@ def router(url) -> bytes:
     Returns:
         bytes: The HTTP response in bytes.
     """
-    if url == "/":
-        return b"HTTP/1.1 200 OK\r\n\r\n"
-    elif url.startswith("/echo"):
-        content = url.split("/")[2]
-        content_len = len(content)
-        return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode(
-            "utf-8"
-        )
-    else:
-        return b"HTTP/1.1 404 Not Found\r\n\r\n"
+    endpoint = "".join(url.split("/")[ENDPOINT_SLICE])
+    print("ENDPOINT: ", endpoint)
+    mapping = {
+        "": root,
+        "echo": echo,
+    }
+    return mapping.get(endpoint, not_found)(url=url)
 
 
 def main():
