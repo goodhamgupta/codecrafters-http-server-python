@@ -4,11 +4,12 @@ from threading import Thread
 from argparse import Namespace
 import argparse
 from typing import Tuple
+import gzip
 
 
 class View:
     ENCODING_IDX = 2
-    VALID_ENCODINGS = ["utf-8", "utf-16", "utf-32", "gzip"]
+    VALID_ENCODINGS = ["gzip"]
 
     @staticmethod
     def root(**args) -> bytes:
@@ -31,8 +32,8 @@ class View:
         Returns:
             bytes: The HTTP response in bytes.
         """
-        content = args["url"].split("/")[2]
         content_encoding_header = ""
+        should_encode_content = False
         if len(args["request_lines"]) > cls.ENCODING_IDX:
             encoding_split = args["request_lines"][cls.ENCODING_IDX].split(":")
             if len(encoding_split) > 1:
@@ -42,8 +43,13 @@ class View:
                 for candidate_encoding in encoding_list:
                     if candidate_encoding in cls.VALID_ENCODINGS:
                         valid_encodings.append(candidate_encoding)
+                        should_encode_content = True
                 if len(valid_encodings) > 0:
                     content_encoding_header = f"Content-Encoding: {','.join(valid_encodings)}"
+        content = args["url"].split("/")[2]
+        if should_encode_content:
+            content = content.encode("utf-8")
+            content = gzip.compress(content)
         content_len = len(content)
         if len(content_encoding_header) > 0:
             return f"HTTP/1.1 200 OK\r\n{content_encoding_header}\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode(
