@@ -51,11 +51,14 @@ class View:
                         f"Content-Encoding: {','.join(valid_encodings)}"
                     )
         content = args["url"].split("/")[2]
+        content = content.encode("utf-8")
         if should_encode_content:
-            content = gzip.compress(content.encode("utf-8"))
+            tmp = gzip.compress(content)
+            content = tmp.hex()
+            content_len = len(tmp)
+            print("GZIP")
         else:
-            content = content.encode("utf-8")
-        content_len = len(content)
+            content_len = len(content)
         print("Content: ", content)
         print("Content Length: ", content_len)
         print("Content Encoding Header: ", content_encoding_header)
