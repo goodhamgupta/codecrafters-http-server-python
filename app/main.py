@@ -1,7 +1,7 @@
 import socket
 
 
-def check_url(url) -> bytes:
+def router(url) -> bytes:
     """
     Checks the requested URL and returns the appropriate HTTP response.
 
@@ -13,6 +13,12 @@ def check_url(url) -> bytes:
     """
     if url == "/":
         return b"HTTP/1.1 200 OK\r\n\r\n"
+    elif url.startswith("/echo"):
+        content = url.split("/")[2]
+        content_len = len(content)
+        return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_len}\r\n\r\n{content}".encode(
+            "utf-8"
+        )
     else:
         return b"HTTP/1.1 404 Not Found\r\n\r\n"
 
@@ -28,10 +34,11 @@ def main():
             # Host: localhost:4221
             # User-Agent: curl/8.4.0
             # Accept: */*
+            print("Received request:", request)
             request_line = request.splitlines()[0]
             url = request_line.split()[1]
             print(f"Requested URL: {url}")
-            response = check_url(url)
+            response = router(url)
             client_sock.sendall(response)
             client_sock.close()
 
